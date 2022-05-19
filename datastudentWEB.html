@@ -1,0 +1,67 @@
+<html>
+  <body id="body">
+    <h1>Students Data:</h1>
+
+    <table id="table" border="1">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Faculty</th>
+        <th>Bitrth Day</th>
+        <th>Exams</th>
+      </tr>
+    </table>
+    <br />
+    <button onclick="getStudentById()">Get Students Data</button>
+    <script>
+      let counter = 0;
+      const getStudentById = async () => {
+        const id = localStorage.getItem("id")
+        
+        const response = await fetch(`http://localhost:8000/students/${id}`);
+        const data = await response.json();
+
+        
+        const table = document.getElementById("table");
+        if (counter === 0) {
+            counter++;
+            
+            const tr = document.createElement("tr");
+
+            const tdName = document.createElement("td");
+            const tdEmail = document.createElement("td");
+            const tdFaculty = document.createElement("td");
+            const tdBirth = document.createElement("td");
+            const tdExams = document.createElement("td");
+
+            tdName.innerHTML = data.name;
+            tdEmail.innerHTML = data.email;
+            tdFaculty.innerHTML = data.faculty;
+            tdBirth.innerHTML = data.birth;
+            
+            for (let i = 0; i < data.exams.length; i++) {
+                tdExams.innerHTML += ` Exam ${i+1}-  Subject Name: ${data.exams[i].name}, Date: ${data.exams[i].date}, Grade: ${data.exams[i].grade}.` 
+                const br = document.createElement("br") // add br that we see the exams separate in every line in the table.
+                tdExams.appendChild(br)
+            }
+
+            tr.appendChild(tdName);
+            tr.appendChild(tdEmail);
+            tr.appendChild(tdFaculty);
+            tr.appendChild(tdBirth);
+            tr.appendChild(tdExams);
+
+            table.appendChild(tr);
+        } else if (counter === 1) {
+          counter++;
+          console.log("Button Alredy pressed");
+
+          const body = document.getElementById("body");
+          const h3 = document.createElement("h3");
+          h3.innerText = "Already Got The Student Data.";
+          body.appendChild(h3);
+        }
+      };
+    </script>
+  </body>
+</html>

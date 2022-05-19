@@ -1,0 +1,136 @@
+<html>
+  <body>
+    <h1>Studend Exams</h1>
+    <h3>(Refresh the page to see the results)</h3>
+    <table id="table" border="1">
+      <th>Exam Number</th>
+      <th>Name Of Subject</th>
+      <th>The Date</th>
+      <th>The Grade</th>
+    </table>
+    <button onclick="getExams()">Get Student Exams</button>
+    <br /><br><br>
+    Exam Number (only for Edit): <input type="number" id="exam" min="0"/> <br>
+    Name:<input type="text" id="name" /><br />
+    Date: (For example - 2002-12-09) <input type="text" id="date" /><br />
+    Grade: <input type="number" id="grade" /><br /> <br>
+    <button onclick="EditExam()">Edit Exam</button> 
+    <button style="margin-left: 4em;" onclick="AddExam()">Add Exam</button>
+
+    <script>
+        
+            let counter = 0;
+            const getExams = async () => {
+              if (counter === 0) {
+                counter++;
+
+                const id = localStorage.getItem("id");
+
+                const response = await fetch(`http://localhost:8000/students/${id}`);
+                const data = await response.json();
+
+                const table = document.getElementById("table");
+
+                for (let i = 0; i < data.exams.length; i++) { // I did for loop so i can print the exam number in tdExam.
+                    const tr = document.createElement("tr");
+                
+                    const tdExam = document.createElement("td")
+                    const tdName = document.createElement("td");
+                    const tdDate = document.createElement("td");
+                    const tdGrade = document.createElement("td");
+
+                    tdExam.innerHTML = i+1
+                    tdName.innerHTML = data.exams[i].name
+                    tdDate.innerHTML = data.exams[i].date;
+                    tdGrade.innerHTML = data.exams[i].grade;
+
+                    tr.appendChild(tdExam)
+                    tr.appendChild(tdName);
+                    tr.appendChild(tdDate);
+                    tr.appendChild(tdGrade);
+
+                    table.appendChild(tr)
+
+                  }
+
+                };
+              }
+            
+            const EditExam = async () => {
+              const id = localStorage.getItem("id");
+
+              const response = await fetch(`http://localhost:8000/students/${id}`)
+              const data = await response.json()
+              
+              const exam = document.getElementById("exam").value;
+              const name = document.getElementById("name").value;
+              const date = document.getElementById("date").value;
+              const grade = document.getElementById("grade").value;
+
+              
+              let exams1 = [];
+                
+                const editedStudent = {
+                name: document.getElementById(`name`).value,
+                date: document.getElementById("date").value,
+                grade: document.getElementById("grade").value,
+                };
+
+                
+                data.exams[exam-1] = editedStudent
+                
+                const updatedStudent = {
+                   exams:data.exams
+                }
+                
+
+
+
+              const response1 = await fetch(`http://localhost:8000/students/${id}`,{
+                method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(updatedStudent),
+                }
+              );
+              
+              console.log("Updeted Exam!");
+
+              
+            };
+
+            const AddExam = async() => {
+              const id = localStorage.getItem("id");
+
+              const response = await fetch(`http://localhost:8000/students/${id}`)
+              const data = await response.json()
+
+                let exams = [];
+                
+                const newstudent = {
+                name: document.getElementById(`name`).value,
+                date: document.getElementById("date").value,
+                grade: document.getElementById("grade").value,
+                };
+              
+                
+                data.exams.push(newstudent)
+                
+                
+                const updatedStudent = {
+                    exams:data.exams
+                }
+
+                // updatedStudent.exams[updatedStudent.exams.length - 1].date instanceof Date;   // The last exams that we added, check that its a Date and not string.
+
+                const response1 = await fetch(`http://localhost:8000/students/${id}`, {
+                 method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(updatedStudent),
+                })
+                
+                console.log("Added Exam!");
+                
+            }
+    </script>
+  </body>
+</html>

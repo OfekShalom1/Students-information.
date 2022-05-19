@@ -1,0 +1,136 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="MainPage.css" >
+  </head>
+  <body id="body" >
+    <h1 >Students Date - Main Page </h1>
+<h3>Refresh the page after changes</h3>
+    <table id="table" border="5">
+
+      <tr>
+        <th>Full Name</th>
+        <th>Faculty</th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+
+    </table>
+    <br />
+
+    <button onclick="getall()">Get All</button>
+    <br />
+
+    <button onclick="Add()">Add Student</button>
+    <script>
+      const Add = () => {                                // 4 funcions that just go to page.
+        window.location.href = "./AddCreate.html";
+      };
+      const GoToEditData = () => {                        // 3 of the 4 functions added to a button later in function getall.
+        window.location.href = "./datastudentWEB.html";
+      };
+      const GoToExams = () => {
+        window.location.href = "./examsWeb.html";
+      };
+      const GoToEditPage = () => {
+        window.location.href = "./EditCreate_WEB.html";
+      };
+
+      let counter = 0; // counter check that we can press get data just 1 time
+
+      const getall = async () => {
+        // get all students information to the table html.
+        const response = await fetch("http://localhost:8000/students");
+        const data = await response.json();
+
+        const table = document.getElementById("table");
+       
+        if (counter === 0) {
+          
+          counter++;
+
+          data.forEach((el) => {
+            const tr = document.createElement("tr");
+
+            const tdName = document.createElement("td"); // set each td for names , faculties, exams buttons, edit buttons and delete buttons.
+            const tdFaculty = document.createElement("td");
+            const tdExams = document.createElement("td");
+            const tdEdit = document.createElement("td");
+            const tdDelete = document.createElement("td");
+
+            const transferDataAndId = () => {
+              // tranfer id so we know which student data to show
+              localStorage.setItem("id", el._id);
+              GoToEditData();
+            };
+            const Namebutton = document.createElement("button");
+            Namebutton.innerHTML = el.name;
+            Namebutton.onclick = transferDataAndId;
+            tdName.appendChild(Namebutton); // add every td his value and inner text.
+
+            tdFaculty.innerText = el.faculty;
+
+            const examsbutton = document.createElement("button");
+            examsbutton.innerHTML = "Exams";
+
+            const transferToExams = () => {
+              localStorage.setItem("id", el._id);
+              GoToExams();
+            };
+
+            examsbutton.onclick = transferToExams;
+
+            const editbutton = document.createElement("button");
+            editbutton.innerHTML = "Edit";
+
+            const transferToEdit = () => {
+              localStorage.setItem("id", el._id);
+              GoToEditPage();
+            };
+            editbutton.onclick = transferToEdit;
+
+            const deletebutton = document.createElement("button");
+            deletebutton.innerHTML = "Delete";
+
+            const onMouseOverDelete = () => {
+              // change the id value so id we click delete it delted the correct student info.
+              localStorage.setItem("id", el._id);
+            };
+            const onclickDelete = async () => {
+              const idDelete = localStorage.getItem("id"); // get the id we ser on when mouse over delete button.
+              const response = await fetch(
+                `http://localhost:8000/students/${idDelete}`,
+                {
+                  method: "DELETE",
+                }
+              );
+              console.log("Student Deleted successfully!");
+            };
+            deletebutton.onmouseover = onMouseOverDelete;
+            deletebutton.onclick = onclickDelete;
+
+            tdExams.appendChild(examsbutton);
+            tdEdit.appendChild(editbutton);
+            tdDelete.appendChild(deletebutton);
+
+            tr.appendChild(tdName); // add all table's data to the table row.
+            tr.appendChild(tdFaculty);
+            tr.appendChild(tdExams);
+            tr.appendChild(tdEdit);
+            tr.appendChild(tdDelete);
+
+            table.appendChild(tr); // add the table row to main table.
+          });
+        } else if (counter === 1) { // say to client that he already go the data.
+          counter++;
+          console.log("Button Alredy pressed");
+
+          const body = document.getElementById("body");
+          const h3 = document.createElement("h3");
+          h3.innerText = "Already Got The Data.";
+          body.appendChild(h3);
+        }
+      };
+    </script>
+  </body>
+</html>

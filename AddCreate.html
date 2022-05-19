@@ -1,0 +1,54 @@
+<html>
+  <body>
+    <h1>Add Student</h1>
+    
+    <h3>(Exams can be add in the main Page on exams link of the student!)</h3>
+    <br />
+    
+    <form>
+      Name: <input type="text" id="name" /><br />
+      Email: <input type="text" id="email" /><br />
+      Faculty: <input type="text" id="faculty" /><br />
+      Birth-Day: (For example - 2002-12-09)<input type="text" id="birth" /><br />
+    
+      <button onclick="addStudent()">Add Stuedent</button> <br>
+      
+    </form>
+    <button onclick="backToMainPage()">Main Page</button>
+    
+
+  
+    <script>
+      
+      const addStudent = async () => {
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const faculty = document.getElementById("faculty").value;
+        const birth = document.getElementById("birth").value;
+
+        const newstudent = {
+          name: name,
+          email: email,
+          faculty: faculty,
+          birth: birth,
+          exams:[]
+        };
+        
+        newstudent.birth instanceof Date; // Make Sure the date will be a Date and not String.
+        
+        const response = await fetch("http://localhost:8000/students/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newstudent),
+        })
+        .then((response) =>  console.log(response.json()))
+
+      };
+
+      const backToMainPage = () => {
+        window.location.href = "./MainWeb.html"
+      }
+
+    </script>
+  </body>
+</html>

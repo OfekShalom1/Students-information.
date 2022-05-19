@@ -1,0 +1,106 @@
+<html>
+  <body id="body">
+    
+    <h1>Update / Create Student - Page</h1>
+    
+    <form id="form">
+      Name:<input type="text" id="name" /><br />
+      Email:<input type="text" id="email" /><br />
+      Faculty:<input type="text" id="faculty" /><br />
+      BirthDay:<input type="text" id="birth" /><br />
+      Exams:<br />
+     
+      <span >Exam Subject:</span> 
+      <span style="margin-left: 5em;">Date:</span>
+      <span style="margin-left: 8.6em;">Grade:</span>
+      <br>
+    </form>
+    
+    <button onclick="getdata()">Get Student Information</button> <br />
+    
+    <button onclick="editButton()">Update Student</button>
+    
+    <script>
+    
+    
+     const getdata = async () => {
+        const id = localStorage.getItem("id");
+
+        const response = await fetch(`http://localhost:8000/students/${id}`);
+        const data = await response.json();
+
+        const name = document.getElementById("name");
+        const email = document.getElementById("email");
+        const faculty = document.getElementById("faculty");
+        const birth = document.getElementById("birth");
+        
+        name.value = data.name;
+        email.value = data.email;
+        faculty.value = data.faculty;
+        birth.value = data.birth;
+
+        const form = document.getElementById("form");
+
+        for (let i = 0; i < data.exams.length; i++) {
+          const examName = document.createElement("input");
+          const examDate = document.createElement("input");
+          const examGrade = document.createElement("input");
+
+          examName.value = `${data.exams[i].name}`;
+          examDate.value = `${data.exams[i].date}`;
+          examGrade.value = `${data.exams[i].grade}`;
+
+          examName.id = `examName${i}`; // set id so i can edit the values in editButton func.
+          examDate.id = `examDate${i}`;
+          examGrade.id = `examGrade${i}`;
+
+          form.appendChild(examName);
+          form.appendChild(examDate);
+          form.appendChild(examGrade);
+
+          const br = document.createElement("br") // Break the line so the client can separate between the exams
+          form.appendChild(br)
+        }
+      };
+
+      const editButton = async () => {
+        const id = localStorage.getItem("id");
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const faculty = document.getElementById("faculty").value;
+        const birth = document.getElementById("birth").value;
+
+        const resp = await fetch(`http://localhost:8000/students/${id}`);
+        const data = await resp.json();
+
+        let exams = [];
+        for (let i = 0; i < data.exams.length; i++) {
+          exams[i] = {
+            name: document.getElementById(`examName${i}`).value,
+            date: document.getElementById(`examDate${i}`).value,
+            grade: document.getElementById(`examGrade${i}`).value,
+          };
+        }
+
+        const updatedStudent = {
+          name: name,
+          email: email,
+          faculty: faculty,
+          birth: birth,
+          exams: exams,
+        };
+
+        const response = await fetch(`http://localhost:8000/students/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedStudent),
+        });
+      };
+
+      const addStudentButton = async () => {
+        const id = localStorage.getItem("id");
+      };
+    </script>
+  </body>
+</html>
